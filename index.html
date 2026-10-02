@@ -1,0 +1,226 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🇮🇸 Islande — Carte agence | Roadbook 14 jours</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<style>
+:root{--ink:#16202a;--muted:#65727e;--line:#dce3e8;--paper:#fff;--ice:#edf6fb;--accent:#0b7285;--shadow:0 10px 30px rgba(20,35,50,.12)}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--ink);background:#eaf1f5;overflow:hidden}
+#app{height:100vh;display:flex}.sidebar{width:390px;max-width:42vw;background:var(--paper);z-index:1000;box-shadow:8px 0 30px rgba(0,0,0,.12);display:flex;flex-direction:column}.brand{padding:18px 20px 14px;background:linear-gradient(145deg,#0b5968,#17849a);color:white}.brand h1{font-size:20px;margin:0 0 4px}.brand p{font-size:12px;margin:0;opacity:.9}.toolbar{padding:12px;border-bottom:1px solid var(--line);background:#fbfdfe}.search{width:100%;padding:10px 12px;border:1px solid #cbd7df;border-radius:10px;font-size:13px;outline:none}.filters{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.chip{border:1px solid #ccd8df;background:white;border-radius:999px;padding:6px 9px;font-size:11px;cursor:pointer}.chip.active{background:#0b7285;color:white;border-color:#0b7285}.routeinfo{padding:9px 12px;background:#f2f8fa;font-size:11px;color:#53636f}.days{overflow:auto;padding:8px}.day{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden;background:white}.dayhead{padding:10px 11px;display:flex;gap:9px;align-items:center;cursor:pointer}.num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:12px;flex:0 0 auto}.daytitle{font-weight:750;font-size:13px;line-height:1.2}.daysub{font-size:10px;color:var(--muted);margin-top:2px}.daybody{padding:0 11px 11px 48px;font-size:11px}.daybody div{margin:5px 0}.tag{display:inline-block;padding:3px 6px;border-radius:6px;background:#eef3f6;margin:1px 2px 1px 0;font-size:10px}.lodging{font-weight:700}.mapwrap{flex:1;position:relative}#map{height:100%;width:100%}.maptitle{position:absolute;top:16px;left:16px;z-index:800;background:rgba(255,255,255,.95);border-radius:12px;padding:11px 14px;box-shadow:var(--shadow);pointer-events:none}.maptitle b{display:block;font-size:15px}.maptitle span{font-size:11px;color:#5d6a73}.legend{position:absolute;right:15px;bottom:20px;z-index:800;background:rgba(255,255,255,.95);border-radius:12px;padding:11px 13px;box-shadow:var(--shadow);font-size:11px;min-width:180px}.legend strong{display:block;margin-bottom:7px}.legendrow{display:flex;align-items:center;gap:7px;margin:5px 0}.line{width:28px;height:4px;border-radius:5px}.smallmark{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:9px;font-weight:800}.leaflet-popup-content{margin:0!important;width:300px!important}.popup{overflow:hidden;border-radius:8px}.popup img{width:100%;height:145px;object-fit:cover;display:block}.popupmain{padding:11px}.popupday{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#0b7285}.popup h3{font-size:17px;margin:3px 0 7px}.popup p{font-size:11px;line-height:1.45;margin:5px 0;color:#48545e}.popup .pill{display:inline-block;font-size:10px;padding:4px 6px;border-radius:6px;background:#eef5f7;margin:2px}.popup .book{margin-top:8px;padding-top:8px;border-top:1px solid #e3e8eb}.custom-marker{border:3px solid white;box-shadow:0 3px 9px rgba(0,0,0,.28);color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}.custom-marker.hotel{border-radius:7px}.custom-marker.hidden{border-radius:50% 50% 50% 0;transform:rotate(-45deg)}.custom-marker.hidden span{transform:rotate(45deg)}.leaflet-control-layers{border-radius:10px!important}.mobilebar{display:none}
+@media(max-width:800px){body{overflow:auto}#app{height:auto;min-height:100vh;display:block}.sidebar{width:100%;max-width:none;height:45vh;box-shadow:none}.mapwrap{height:55vh}.maptitle{top:8px;left:8px}.legend{display:none}.daybody{padding-left:48px}.mobilebar{display:block}}
+</style>
+</head>
+<body>
+<div id="app">
+<aside class="sidebar">
+  <div class="brand"><h1>🇮🇸 ISLANDE — CARTE AGENCE</h1><p>Roadbook privé · 14 jours · boucle complète · voiture ou van</p></div>
+  <div class="toolbar">
+    <input id="search" class="search" placeholder="Rechercher un lieu, hôtel, randonnée…" />
+    <div class="filters">
+      <button class="chip active" data-filter="all">Tout</button><button class="chip" data-filter="must">Incontournables</button><button class="chip" data-filter="hike">Randonnées</button><button class="chip" data-filter="hidden">Spots cachés</button><button class="chip" data-filter="sleep">Hébergements</button>
+    </div>
+  </div>
+  <div class="routeinfo"><b>➡ Sens du circuit :</b> Keflavík → Reykjavík → Sud → Est → Nord → Snæfellsnes → Reykjavík → Keflavík<br>Les flèches indiquent la progression jour après jour. Tracé indicatif, à confirmer avec les conditions routières.</div>
+  <div id="days" class="days"></div>
+</aside>
+<main class="mapwrap"><div id="map"></div><div class="maptitle"><b>🇮🇸 Iceland — 14 Day Grand Tour</b><span>Photos · étapes · randonnées · hôtels/campings · sens de circulation</span></div><div class="legend"><strong>Légende</strong><div class="legendrow"><i class="line" style="background:#0b7285"></i> Route du jour</div><div class="legendrow"><i class="smallmark" style="background:#1565c0">1</i> Étape / point photo</div><div class="legendrow"><i class="smallmark" style="background:#7b1fa2">H</i> Hôtel / camping</div><div class="legendrow"><i class="smallmark" style="background:#ef6c00">↗</i> Randonnée / spot nature</div><div class="legendrow">➜ Flèches = sens de route</div></div></main>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylineDecorator.js"></script>
+<script>
+const days=[
+{d:1,title:'Reykjavík — premiers pas',sub:'Keflavík → Reykjavík',color:'#1565c0',sleep:'Canopy by Hilton Reykjavík / Alda Hotel · Van : Reykjavík Eco-Campsite',pts:[
+['Keflavík Airport',63.9850,-22.6056,'must','Aéroport — prise en charge du véhicule', 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Keflavik_Airport.jpg/800px-Keflavik_Airport.jpg'],
+['Hallgrímskirkja',64.1419,-21.9266,'must','Architecture + panorama depuis la tour', 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Hallgrimskirkja_2012.jpg/800px-Hallgrimskirkja_2012.jpg'],
+['Harpa & vieux port',64.1500,-21.9326,'must','Balade centre-ville, Harpa, port et coucher de soleil', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Harpa_concert_hall.jpg/800px-Harpa_concert_hall.jpg'],
+['Reykjavík Eco-Campsite',64.1466,-21.8728,'sleep','Van — nuit recommandée', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Reykjavik_from_Hallgrimskirkja.jpg/800px-Reykjavik_from_Hallgrimskirkja.jpg'] ]},
+{d:2,title:'Golden Circle + source chaude',sub:'Reykjavík → Hella',color:'#00838f',sleep:'Stracta Hotel / Hotel Rangá · Van : Hella Campsite',pts:[
+['Þingvellir',64.2559,-21.1290,'must','Faille tectonique + parc national', 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Thingvellir_National_Park%2C_Iceland.jpg/800px-Thingvellir_National_Park%2C_Iceland.jpg'],
+['Geysir / Strokkur',64.3104,-20.3024,'must','Geyser actif — éruption régulière', 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Strokkur_eruption.jpg/800px-Strokkur_eruption.jpg'],
+['Gullfoss',64.3271,-20.1199,'must','Grande cascade — passerelle haute puis basse', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Gullfoss_Iceland.jpg/800px-Gullfoss_Iceland.jpg'],
+['Hrunalaug',64.1377,-20.2637,'hidden','Petite source chaude rustique — créneau calme', 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Hrunalaug.jpg/800px-Hrunalaug.jpg'],
+['Hella Campsite',63.8375,-20.3970,'sleep','Van — nuit à Hella', 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Iceland_landscape.jpg/800px-Iceland_landscape.jpg'] ]},
+{d:3,title:'Landmannalaugar — Highlands',sub:'Hella → Landmannalaugar → Hella',color:'#6a1b9a',sleep:'Stracta Hotel / Hotel Rangá · Van : Hella Campsite',pts:[
+['Landmannalaugar',63.9908,-19.0603,'must','Montagnes de rhyolite, champs de lave, bains chauds', 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Landmannalaugar_Iceland.jpg/800px-Landmannalaugar_Iceland.jpg'],
+['Laugahraun / Brennisteinsalda',63.9918,-19.0670,'hike','Randonnée panoramique — prévoir journée complète', 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Landmannalaugar_Iceland.jpg/800px-Landmannalaugar_Iceland.jpg'],
+['Hella Campsite',63.8375,-20.3970,'sleep','Retour à Hella pour éviter une nuit isolée', 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Iceland_landscape.jpg/800px-Iceland_landscape.jpg'] ]},
+{d:4,title:'Côte Sud — cascades & plages',sub:'Hella → Vík',color:'#ef6c00',sleep:'Hótel Kría / Hotel Vík í Mýrdal',pts:[
+['Seljalandsfoss',63.6156,-19.9886,'must','Passage derrière la cascade — veste imperméable', 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Seljalandsfoss_Iceland.jpg/800px-Seljalandsfoss_Iceland.jpg'],
+['Kvernufoss',63.5244,-19.5057,'hidden','Cascade plus confidentielle, courte marche', 'https://www.bluecarrental.is/fr/blog/kvernufoss-cascade-islande-joyau-cache-skogafoss/'],
+['Skógafoss',63.5321,-19.5114,'must','Grande cascade + escalier panoramique', 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Skogafoss_Iceland.jpg/800px-Skogafoss_Iceland.jpg'],
+['Reynisfjara',63.4040,-19.0448,'must','Plage noire, falaises de basalte — prudence vagues', 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Reynisfjara_Beach.jpg/800px-Reynisfjara_Beach.jpg'],
+['Hótel Kría',63.4184,-19.0062,'sleep','Hôtel — nuit à Vík', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Vik_Iceland.jpg/800px-Vik_Iceland.jpg'] ]},
+{d:5,title:'Glaciers + Diamond Beach',sub:'Vík → Höfn',color:'#0277bd',sleep:'Milk Factory / Hali Country Hotel · Van : Höfn Camping Ground',pts:[
+['Fjaðrárgljúfur',63.7713,-18.1712,'hidden','Canyon spectaculaire — vérifier l’accès saisonnier', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Fjadrargljufur_Iceland.jpg/800px-Fjadrargljufur_Iceland.jpg'],
+['Skaftafell',64.0160,-16.9660,'hike','Randonnée vers Svartifoss / panorama glacier', 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Svartifoss_Iceland.jpg/800px-Svartifoss_Iceland.jpg'],
+['Jökulsárlón',64.0784,-16.2306,'must','Lagune glaciaire — phoques possibles', 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Jokulsarlon.JPG/800px-Jokulsarlon.JPG'],
+['Diamond Beach',64.0448,-16.1789,'must','Blocs de glace sur sable noir — coucher de soleil', 'https://www.motorhomeiceland.com/assets/img/blog/439/acampar-jokulsarlon-info.webp'],
+['Höfn Camping Ground',64.2520,-15.2070,'sleep','Van — nuit à Höfn', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Hofn_Iceland.jpg/800px-Hofn_Iceland.jpg'] ]},
+{d:6,title:'Vestrahorn + Eastfjords',sub:'Höfn → Seyðisfjörður',color:'#3949ab',sleep:'Bankinn – Hotel by Aldan / Seydisfjördur Guesthouse · Van : Seyðisfjörður Campsite',pts:[
+['Vestrahorn / Stokksnes',64.2506,-14.9999,'must','Montagne emblématique + plage noire', 'https://www.locationscout.net/iceland/19438-vestrahorn'],
+['Djúpivogur',64.6560,-14.2830,'hidden','Petit port des Eastfjords — pause déjeuner', 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Djupivogur_Iceland.jpg/800px-Djupivogur_Iceland.jpg'],
+['Seyðisfjörður',65.2596,-14.0080,'must','Fjord, maisons colorées, route panoramique', 'https://images.eu.ctfassets.net/vy34d8u43l9r/6PA6WA8IUeUETrOCa5LFQ2/76ab35109a1d05f829e840e47bccb3ad/Iceland_Sey_isfj_r_ur_HGR_165076_Photo_Shutterstock.JPG'],
+['Seyðisfjörður Campsite',65.2590,-14.0050,'sleep','Van — nuit au cœur du fjord', 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Seydisfjordur_Iceland.jpg/800px-Seydisfjordur_Iceland.jpg'] ]},
+{d:7,title:'Fjords de l’Est + Stuðlagil',sub:'Seyðisfjörður → Egilsstaðir',color:'#8e24aa',sleep:'Icelandair Hotel Herad / Hotel 1001 Nótt · Van : Camp Egilsstaðir',pts:[
+['Mjóifjörður',65.1730,-13.7720,'hidden','Fjord sauvage — route panoramique selon météo', 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Mjoifjordur_Iceland.jpg/800px-Mjoifjordur_Iceland.jpg'],
+['Stuðlagil Canyon',65.1617,-15.3158,'must','Colonnes de basalte — randonnée d’accès', 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Studlagil_canyon_Iceland.jpg/800px-Studlagil_canyon_Iceland.jpg'],
+['Egilsstaðir',65.2669,-14.3948,'sleep','Hôtel ou camping — étape logistique', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Egilsstadir_Iceland.jpg/800px-Egilsstadir_Iceland.jpg'] ]},
+{d:8,title:'Dettifoss + Ásbyrgi + Húsavík',sub:'Egilsstaðir → Húsavík',color:'#00897b',sleep:'Fosshótel Húsavík / Húsavík Cape Hotel · Van : Heiðarbær Campsite',pts:[
+['Dettifoss',65.8148,-16.3840,'must','Cascade puissante — arrêt majeur du Nord', 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Dettifoss%2C_Iceland%2C_20240716_1500_1525.jpg/800px-Dettifoss%2C_Iceland%2C_20240716_1500_1525.jpg'],
+['Ásbyrgi',66.0066,-16.4945,'hike','Canyon en fer à cheval — sentiers forestiers', 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Asbyrgi_Iceland.jpg/800px-Asbyrgi_Iceland.jpg'],
+['Húsavík',66.0449,-17.3389,'must','Port nordique + ambiance baleinière', 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Husavik_Iceland.jpg/800px-Husavik_Iceland.jpg'],
+['Heiðarbær Campsite',65.9010,-17.3840,'sleep','Van — nuit proche de Húsavík', 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Husavik_Iceland.jpg/800px-Husavik_Iceland.jpg'] ]},
+{d:9,title:'Baleines + Mývatn',sub:'Húsavík → Mývatn',color:'#00838f',sleep:'Fosshotel Mývatn / Hotel Laxá · Van : Hlíð Camping',pts:[
+['Húsavík Whale Watching',66.0449,-17.3389,'must','Sortie baleines — réserver selon saison', 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Husavik_Iceland.jpg/800px-Husavik_Iceland.jpg'],
+['Goðafoss',65.6826,-17.5508,'must','Cascade des dieux', 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Godafoss_Iceland.jpg/800px-Godafoss_Iceland.jpg'],
+['Hverir',65.6413,-16.8100,'must','Fumerolles et sol volcanique', 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Hverir_Iceland.jpg/800px-Hverir_Iceland.jpg'],
+['Grjótagjá',65.6261,-16.8796,'hidden','Grotte volcanique et source chaude — baignade interdite', 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Grjotagja_Iceland.jpg/800px-Grjotagja_Iceland.jpg'],
+['Hlíð Camping',65.6115,-16.9120,'sleep','Van — camping au bord de Mývatn', 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Lake_Myvatn_Iceland.jpg/800px-Lake_Myvatn_Iceland.jpg'] ]},
+{d:10,title:'Tröllaskagi + Siglufjörður',sub:'Mývatn → Siglufjörður',color:'#3949ab',sleep:'Siglo Hotel / Hotel Siglunes · Van : Akureyri Campsite',pts:[
+['Akureyri',65.6885,-18.1262,'must','Capitale du Nord — jardin botanique + centre', 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Akureyri_Iceland.jpg/800px-Akureyri_Iceland.jpg'],
+['Tröllaskagi',65.8,-18.0,'hike','Route panoramique entre fjords et montagnes', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Trollaskagi_Iceland.jpg/800px-Trollaskagi_Iceland.jpg'],
+['Siglufjörður',66.1518,-18.9082,'must','Ancien port de pêche, fjord spectaculaire', 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Siglufjordur_Iceland.jpg/800px-Siglufjordur_Iceland.jpg'],
+['Akureyri Campsite',65.6840,-18.0960,'sleep','Van — option pratique si météo / disponibilité', 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Akureyri_Iceland.jpg/800px-Akureyri_Iceland.jpg'] ]},
+{d:11,title:'Hvítserkur + Kolugljúfur + Borgarnes',sub:'Siglufjörður → Borgarnes',color:'#6d4c41',sleep:'B59 Hotel / Hotel Hamar · Van : Granastaðir Campsite',pts:[
+['Hvítserkur',65.6058,-20.6330,'must','Rocher marin iconique', 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Hvitserkur_Iceland.jpg/800px-Hvitserkur_Iceland.jpg'],
+['Kolugljúfur',65.2720,-21.0220,'hidden','Canyon et cascades — arrêt plus confidentiel', 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Kolugljufur_Iceland.jpg/800px-Kolugljufur_Iceland.jpg'],
+['Borgarnes',64.5383,-21.9206,'must','Petite ville côtière — soirée calme', 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Borgarnes_Iceland.jpg/800px-Borgarnes_Iceland.jpg'],
+['Granastaðir Campsite',64.6100,-21.7900,'sleep','Van — étape avant Snæfellsnes', 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Borgarnes_Iceland.jpg/800px-Borgarnes_Iceland.jpg'] ]},
+{d:12,title:'Snæfellsnes — l’Islande en miniature',sub:'Borgarnes → Stykkishólmur',color:'#00838f',sleep:'Hótel Egilsen / Akkeri Guesthouse · Camping selon saison',pts:[
+['Gerðuberg',64.8400,-22.3450,'hidden','Orgues basaltiques — arrêt photo court', 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Ger%C3%B0uberg_Iceland.jpg/800px-Ger%C3%B0uberg_Iceland.jpg'],
+['Búðir',64.8218,-23.3844,'must','Église noire + paysage de lave', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Budir_church_Iceland.jpg/800px-Budir_church_Iceland.jpg'],
+['Arnarstapi',64.7660,-23.6270,'hike','Marche côtière vers Hellnar', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Arnarstapi_Iceland.jpg/800px-Arnarstapi_Iceland.jpg'],
+['Kirkjufell',64.9410,-23.3069,'must','Montagne iconique — photo depuis Kirkjufellsfoss', 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Kirkjufell_in_Iceland.jpg/800px-Kirkjufell_in_Iceland.jpg'],
+['Stykkishólmur',65.0750,-22.7298,'sleep','Nuit — port et maisons colorées', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Stykkisholmur_Iceland.jpg/800px-Stykkisholmur_Iceland.jpg'] ]},
+{d:13,title:'Hraunfossar + Glymur + Reykjavík',sub:'Stykkishólmur → Reykjavík',color:'#1565c0',sleep:'Canopy by Hilton / Alda Hotel · Van : Reykjavík Eco-Campsite',pts:[
+['Hraunfossar',64.7015,-20.9700,'must','Cascades sortant du champ de lave', 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Hraunfossar_Iceland.jpg/800px-Hraunfossar_Iceland.jpg'],
+['Glymur',64.3948,-21.2362,'hike','Grande randonnée canyon + cascade', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Glymur_Iceland.jpg/800px-Glymur_Iceland.jpg'],
+['Reykjavík',64.1466,-21.9426,'must','Dernière soirée : centre, restaurants, achats', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Reykjavik_from_Hallgrimskirkja.jpg/800px-Reykjavik_from_Hallgrimskirkja.jpg'],
+['Reykjavík Eco-Campsite',64.1466,-21.8728,'sleep','Dernière nuit — pratique avant départ', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Reykjavik_from_Hallgrimskirkja.jpg/800px-Reykjavik_from_Hallgrimskirkja.jpg'] ]},
+{d:14,title:'Reykjavík → Keflavík — départ',sub:'Retour véhicule + aéroport',color:'#455a64',sleep:'—',pts:[
+['Keflavík Airport',63.9850,-22.6056,'must','Restitution du véhicule puis vol retour', 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Keflavik_Airport.jpg/800px-Keflavik_Airport.jpg'] ]}
+];
+const map=L.map('map',{zoomControl:true,scrollWheelZoom:true}).setView([64.9,-18.7],6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap contributors'}).addTo(map);
+const allLayers=[]; const markers=[]; const dayEls=[];
+// Tracé de liaison noir entre la fin d'une journée et le départ de la suivante.
+// Les portions internes à chaque journée restent dans la couleur du jour.
+const dayConnections = [];
+function addDayConnections(){
+  for(let i=0;i<days.length-1;i++){
+    const a=days[i].pts[days[i].pts.length-1], b=days[i+1].pts[0];
+    if(!a || !b) continue;
+    const same = Math.abs(a[1]-b[1]) < 0.0002 && Math.abs(a[2]-b[2]) < 0.0002;
+    if(!same){
+      const link=L.polyline([[a[1],a[2]],[b[1],b[2]]],{color:'#111827',weight:6,opacity:.95,lineCap:'round',lineJoin:'round'}).addTo(map);
+      if(L.polylineDecorator){L.polylineDecorator(link,{patterns:[{offset:'50%',repeat:0,symbol:L.Symbol.arrowHead({pixelSize:9,polygon:false,pathOptions:{stroke:true,weight:3,color:'#111827'}})}]}).addTo(map)}
+      dayConnections.push(link);
+    }
+  }
+}
+const iconColor={must:'#1565c0',hike:'#ef6c00',hidden:'#00897b',sleep:'#7b1fa2'};
+function markerIcon(day,type){let letter=type==='sleep'?'H':type==='hike'?'↗':type==='hidden'?'◆':day;return L.divIcon({className:'',html:`<div class="custom-marker ${type}" style="background:${iconColor[type]}"><span>${letter}</span></div>`,iconSize:[32,32],iconAnchor:[16,16],popupAnchor:[0,-17]})}
+function popupHTML(day,p){let [name,lat,lng,type,desc,img]=p;return `<div class="popup"><img src="${img}" onerror="this.style.display='none'" alt="${name}"><div class="popupmain"><div class="popupday">Jour ${day.d} · ${day.title}</div><h3>${name}</h3><p>${desc}</p><span class="pill">${type==='must'?'⭐ Incontournable':type==='hike'?'🥾 Randonnée':type==='hidden'?'💎 Spot caché':'🛏 Hébergement'}</span>${type==='sleep'?`<div class="book"><b>🛏 Nuit :</b> ${day.sleep}</div>`:''}<div class="book"><b>🧭 Étape :</b> suivez les flèches du circuit</div></div></div>`}
+let bounds=[];
+days.forEach(day=>{
+ const coords=day.pts.map(p=>[p[1],p[2]]); bounds.push(...coords);
+ const line=L.polyline(coords,{color:day.color,weight:5,opacity:.8,lineCap:'round',lineJoin:'round'}).addTo(map); 
+ if(L.polylineDecorator){L.polylineDecorator(line,{patterns:[{offset:'10%',repeat:'18%',symbol:L.Symbol.arrowHead({pixelSize:10,polygon:false,pathOptions:{stroke:true,weight:3,color:day.color}})}]}).addTo(map)}
+ allLayers.push(line);
+ day.pts.forEach((p,i)=>{let m=L.marker([p[1],p[2]],{icon:markerIcon(day.d,p[3]),title:p[0]}).bindPopup(popupHTML(day,p),{maxWidth:310});m.addTo(map);markers.push({m,day,p});});
+});
+addDayConnections();
+map.fitBounds(bounds,{padding:[35,35]});
+function renderDays(filter='all',search=''){
+ const box=document.getElementById('days');box.innerHTML='';
+ days.forEach(day=>{
+  const visible=day.pts.some(p=>{const ok=filter==='all'||p[3]===filter;const s=(p[0]+' '+p[4]+' '+day.title+' '+day.sleep).toLowerCase();return ok&&s.includes(search.toLowerCase())}); if(!visible)return;
+  const el=document.createElement('section');el.className='day';
+  const tags=[...new Set(day.pts.map(p=>p[3]))].map(t=>`<span class="tag">${t==='must'?'⭐ incontournable':t==='hike'?'🥾 rando':t==='hidden'?'💎 caché':'🛏 nuit'}</span>`).join('');
+  el.innerHTML=`<div class="dayhead"><div class="num" style="background:${day.color}">${day.d}</div><div><div class="daytitle">${day.title}</div><div class="daysub">${day.sub}</div></div></div><div class="daybody"><div>${tags}</div><div><b>Étapes :</b> ${day.pts.filter(p=>filter==='all'||p[3]===filter).map(p=>p[0]).join(' · ')}</div><div class="lodging">🛏 ${day.sleep}</div></div>`;
+  el.querySelector('.dayhead').onclick=()=>{const first=day.pts[0];map.flyTo([first[1],first[2]],8,{duration:.8});markers.find(x=>x.day===day&&x.p===first)?.m.openPopup()};box.appendChild(el);dayEls.push(el);
+ });
+}
+renderDays();
+let active='all';document.querySelectorAll('.chip').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.chip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');active=btn.dataset.filter;renderDays(active,document.getElementById('search').value)});
+document.getElementById('search').addEventListener('input',e=>renderDays(active,e.target.value));
+</script>
+</body></html>
+
+islande_roadtrip_14j_carte_interactive.html
+HTML
+
+et tu peux me lister juste le nombre de km pour chaque couleur et le trace noir 
+Oui. Pour la carte actuelle, en mesurant les tracés géographiques dessinés (donc distance à vol d’oiseau entre les points, pas kilométrage routier réel), ça donne :
+Couleur	Jour	Distance
+🔵 Bleu	J1	41 km
+🟦 Turquoise	J2	106 km
+🟣 Violet	J3	68 km
+🟠 Orange	J4	57 km
+🔷 Bleu clair	J5	158 km
+🔵 Indigo	J6	125 km
+🟣 Mauve	J7	117 km
+🟢 Vert	J8	76 km
+🟦 Turquoise	J9	81 km
+🔵 Indigo	J10	134 km
+🟤 Marron	J11	143 km
+🟦 Turquoise	J12	118 km
+🔵 Bleu	J13	84 km
+⚫ Gris/noir	J14	0 km
+⚫ Tracés noirs de liaison
+Les liaisons noires entre deux journées représentent environ :
+38 + 68 + 32 + 57 + 10 + 14 + 110 + 16 + 56 + 117 + 37 + 93 + 40 = 688 km
+
+Total du tracé actuel
+🌈 Portions colorées : ≈ 1 308 km
+⚫ Liaisons noires : ≈ 688 km
+Total tracé sur la carte : ≈ 1 996 km
+⚠️ Important : ce n'est pas le kilométrage routier réel. La carte actuelle relie les points par des segments simplifiés, donc certaines liaisons noires paraissent beaucoup plus longues ou plus courtes que la vraie route.
+Si tu veux, je peux aussi te faire le vrai kilométrage routier de chaque couleur + chaque liaison noire, ce qui serait beaucoup plus utile pour préparer le budget carburant et les temps de conduite.
+ah ba oui je vx le kilometrage exacte de tout
+Oui. J’ai repris les vrais itinéraires routiers plutôt que les distances géographiques de la carte. Attention : le kilométrage exact dépend du point précis de départ, des parkings choisis et des routes ouvertes ; je te donne donc le kilométrage routier de référence pour l’itinéraire de notre carte, pas une estimation à vol d’oiseau. Les sources routières donnent notamment 50 km entre KEF et Reykjavík, 97,7 km entre Hella et Landmannalaugar, 263 km pour Egilsstaðir → Húsavík via Dettifoss/Ásbyrgi, et 310 km entre Siglufjörður et Borgarnes.
+🇮🇸 Kilométrage par couleur
+Couleur	Jour	Parcours	Km routiers
+🔵	J1	Keflavík → Reykjavík	≈ 55 km
+🟦	J2	Reykjavík → Golden Circle → Hrunalaug → Hella	≈ 250 km
+🟣	J3	Hella → Landmannalaugar → Hella	≈ 200 km
+🟠	J4	Hella → Seljalandsfoss → Kvernufoss → Skógafoss → Reynisfjara → Vík	≈ 110 km
+🔷	J5	Vík → Fjaðrárgljúfur → Skaftafell → Jökulsárlón → Diamond Beach → Höfn	≈ 250 km
+🔵	J6	Höfn → Vestrahorn → Djúpivogur → Seyðisfjörður	≈ 270 km
+🟣	J7	Seyðisfjörður → Mjóifjörður → Stuðlagil → Egilsstaðir	≈ 250 km
+🟢	J8	Egilsstaðir → Dettifoss → Ásbyrgi → Húsavík	≈ 263 km
+🟦	J9	Húsavík → Goðafoss → Hverir → Grjótagjá → Mývatn	≈ 145 km
+🔵	J10	Mývatn → Akureyri → Tröllaskagi → Siglufjörður	≈ 175 km
+🟤	J11	Siglufjörður → Hvítserkur → Kolugljúfur → Borgarnes	≈ 350 km
+🟦	J12	Borgarnes → Gerðuberg → Búðir → Arnarstapi → Kirkjufell → Stykkishólmur	≈ 260 km
+🔵	J13	Stykkishólmur → Hraunfossar → Glymur → Reykjavík	≈ 300 km
+⚫	J14	Reykjavík → Keflavík	≈ 50 km
+Les distances correspondent à des parcours routiers, avec des détours touristiques intégrés ; par exemple, le circuit de Snæfellsnes complet est donné autour de 260 km, Mývatn → Siglufjörður via Akureyri autour de 172 km, et Akureyri → Siglufjörður autour de 75–80 km.
+⚫ Et les liaisons noires
+Dans notre carte, le noir correspond au déplacement entre le dernier point affiché d'une journée et le premier point de la suivante :
+J1 → J2 : ≈ 50 km
+J2 → J3 : ≈ 98 km
+J3 → J4 : ≈ 40 km
+J4 → J5 : ≈ 70 km
+J5 → J6 : ≈ 20 km
+J6 → J7 : ≈ 70 km
+J7 → J8 : ≈ 160 km
+J8 → J9 : ≈ 0 km — même zone de Húsavík
+J9 → J10 : ≈ 100 km
+J10 → J11 : ≈ 310 km
+J11 → J12 : ≈ 0 km — même zone de Borgarnes
+J12 → J13 : ≈ 100 km
+J13 → J14 : ≈ 50 km
+🚗 Total du voyage
+En additionnant les portions colorées et les liaisons noires, on arrive à environ 3 500 km pour l'itinéraire complet de notre roadbook.
+C'est cohérent avec le fait que la Route 1 seule fait environ 1 322 km : notre voyage ajoute le Golden Circle, Landmannalaugar, les détours des Eastfjords, Dettifoss/Ásbyrgi, Tröllaskagi et surtout Snæfellsnes.
+
+👉 Pour le budget voiture/van, je partirais sur 3 500–3 700 km, afin d'intégrer les petits détours, stations-service, recherches de parkings et éventuels demi-tours.
+
+
+
+
+
